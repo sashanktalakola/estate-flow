@@ -43,9 +43,26 @@ async def run(pw):
         logging.debug("Queried location - Glasgow")
 
         regularListings = await page.inner_html('div[data-testid="regular-listings"]')
-        soup = BeautifulSoup(await page.content(), features="html.parser")
+        soup = BeautifulSoup(regularListings, features="html.parser")
 
         for i, listing in enumerate(soup.find_all("div", class_="dkr2t86")):
+
+            listingData = {
+                "title": listing.find("h2").text,
+                "address": listing.find("address").text,
+                "link": HOMEPAGE_URL + listing.find("a")["href"]
+            }
+
+            logging.debug("Nativating to listed property page")
+            await page.goto(listingData["link"])
+            await page.wait_for_load_state("load")
+
+            content = await page.inner_html('div[data-testid="listing-details-page"]')
+            soup = BeautifulSoup(content, features="html.parser")
+            
+
+
+
             pass
 
 
